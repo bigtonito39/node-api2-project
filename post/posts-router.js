@@ -163,10 +163,13 @@ router.post("/:id/comments", (req, res) => {
               message: "Please provide text for the comment."
           })
       }
-      post.insertComment(req.body)
+      post.findById(req.params.id)
+      
        .then(comment => {
            if (comment) {
-               res.status(201).json(comment)
+            post.insertComment({...req.body, post_id: req.params.id})
+            post.findCommentById(req.body.post_id)
+            res.status(201).json(comment)
            }
            else {
                res.status(404).json({
