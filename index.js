@@ -8,9 +8,8 @@ const port = 3000
 
 server.use(express.json())
 
-//Here im assigning 
-server.use("/",welcomeRouter )
 
+server.use("/",welcomeRouter )
 server.use("/api/posts", postRouter)
 
 
