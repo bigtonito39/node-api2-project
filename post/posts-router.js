@@ -76,6 +76,9 @@ router.get("/:id/comments", (req, res) => {
     })
 })
 
+// ------------Updates the post with the specified id 
+//using data from the request body. Returns the modified document, NOT the original.
+
 router.put("/:id", (req, res) => {
 
     if(!req.body.title || !req.body.contents ) {
@@ -90,17 +93,96 @@ router.put("/:id", (req, res) => {
        }
        else{
            res.status(404).json({
-               message:"The post could not be found"
+               message:"The post with the specified ID does not exist."
            })
        }
    })
    .catch( error => {
        res.status(500).json({
-           message: "There was an error while saving the post to the database"
+           message: "The post information could not be modified."
        })
    })
    
 
 })
+
+//----------Creates a post using the information sent inside the request body.
+
+router.post("/", (req, res) => {
+   if (!req.body.title || !req.body.contents){
+   return res.status(400).json({
+       message: "Please provide title and contents for the post."
+   }) 
+} 
+     post.insert(req.body)
+     .then(createdPost => {
+     res.status(201).json(createdPost)
+      }) 
+
+      .catch( error => {
+          res.status(500).json({
+              message: "There was an error while saving the post to the database"
+          })
+      })
+
+})
+
+//-----------------Removes the post with the specified id and returns the deleted post object. 
+
+router.delete("/:id", (req,res) => {
+
+    post.remove(req.params.id)
+
+    .then(post => {
+        console.log(post)
+        if (post > 0) {
+            res.status(200).json({
+                message: "Post been deleted"
+            })
+        }
+        else{
+          res.status(404).json({
+              message: "The Post with specified ID does not exist"
+          })
+        }
+    })
+    .catch( error => {
+        res.status(500).json({
+            message: "The post could not be removed"
+        })
+    })
+
+})
+
+//--------------Creates a comment for 
+//the post with the specified id using information sent inside of the request body.
+
+router.post("/:id/comments", (req, res) => {
+      if(!req.body.text) {
+         return  res.status(400).json({
+              message: "Please provide text for the comment."
+          })
+      }
+      post.insertComment(req.body)
+       .then(comment => {
+           if (comment) {
+               res.status(201).json(comment)
+           }
+           else {
+               res.status(404).json({
+                   message: "The post with the specified ID does not exist."
+               })
+           }
+       })
+
+       .catch( error => {
+           res.status(500).json({
+               message: "There was an error while saving the comment to the database"
+           })
+       })
+
+
+})
+
 
 module.exports = router
