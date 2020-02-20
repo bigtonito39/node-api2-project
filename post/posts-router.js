@@ -163,8 +163,8 @@ router.post("/:id/comments", (req, res) => {
     //Here im making variables since data it will have to be saved first before inserting them to the data base
     
     const {id} =  req.params.id;
-    //im creating a copy of the body, and creating a post_id key:value pair with the new id of the comment being created.
-    const data = {...req.body, post_id: req.params.id}
+    //im creating a copy of the body, and updating post_id with the new id of the comment being created ().
+    const data = {...req.body, Post_id: req.params.id}
     
     // here im pretty much saying that if the client (front end) does not provide to us an input with text: "comments needed to be created"
     // to return an error
@@ -173,22 +173,27 @@ router.post("/:id/comments", (req, res) => {
               message: "Please provide text for the comment."
           })
       }
- //here im finding first the post related with the inputed id
-      post.findById(id)
+ 
+         //here im finding first the post related with the inputed id
+    
+            post.findById(id)      
              .then(comment => {
-        //this logic has to be fixed so that if the id does not return any body it would run this error
-           if (!comment) {
-            res.status(404).json({
-            message: "The post with the specified ID does not exist."
-            })
+         //passing data variable thata contains the copy of the body and post_id
+           // to insertComment function thats in the DB.JS file(database)
+            //here im just returning new text created along a 201 created status.
+           if (comment) {
+            
+            post.insertComment(data)
+            res.status(201).json(data)
+            
            }
 
            else {
-            //passing data variable thata contains the copy of the body and post_id
-           // to insertComment function thats in the DB.JS file(database)
-            post.insertComment(data)
-            //here im just returning new text created along a 201 created status.
-            res.status(201).json(req.body)
+           
+            //this logic has to be fixed so that if the id does not return any body it would run this error
+            res.status(404).json({
+                message: "The post with the specified ID does not exist."
+                })
            }
        })
 
